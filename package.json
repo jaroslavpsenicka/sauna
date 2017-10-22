@@ -1,0 +1,20 @@
+{
+  "name": "sauna",
+  "version": "0.1.0",
+  "description": "Simple sauna application.",
+  "main": "server.js",
+  "author": "JP",
+  "dependencies": {
+    "body-parser": "^1.4.3",
+    "console-stamp": "^0.2.2",
+    "express": "^4.13.4",
+    "express-jwt": "5.1.0",
+    "log4js": "^0.6.37",
+    "method-override": "^2.1.3",
+    "mongoose": "^4.4.12",
+    "mongoosemask": "0.0.6",
+    "morgan": "^1.1.1",
+    "nodemon": "^1.9.2",
+    "node-uuid": "^1.4.8" 
+  }
+}

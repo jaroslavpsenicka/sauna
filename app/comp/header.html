@@ -1,0 +1,30 @@
+<nav class="navbar" role="navigation" ng-controller="HeaderCtrl">
+    <div class="navbar-header">
+
+        <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#/"></a>
+    </div>
+
+    <div class="collapse navbar-collapse" collapse="navCollapsed">
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#/" translate>Home</a></li>
+            <li><a href="#/times" translate>Times</a></li>
+            <li><a href="#/reservations" translate>Reservations</a></li>
+            <li><p class="navbar-text" ng-show="currentUser.id">{{currentUser.name}}</p></li>
+            <li class="dropdown" dropdown>
+                <a href="#" class="dropdown-toggle right-spaced" dropdown-toggle role="button" aria-expanded="false">
+                    <img src="img/language-map.png"> <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    <li><a href="#/" ng-click="useLanguage('en')">English</a></li>
+                    <li><a href="#/" ng-click="useLanguage('cz')">Česky</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>

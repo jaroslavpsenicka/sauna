@@ -1,0 +1,97 @@
+
+angular.module('sauna', [
+  'sauna.services', 'sauna.filters', 'pascalprecht.translate',
+  'ui.bootstrap', 'ngRoute', 'ngAnimate'
+])
+
+.config(['$routeProvider', function ($routeProvider) {
+
+	$routeProvider.when("/", {
+		templateUrl: "home.html",
+		controller: "HomeCtrl"
+	}).when("/login", {
+		templateUrl: "login.html",
+		controller: "LoginCtrl"
+	}).when("/times", {
+		templateUrl: "times.html",
+		controller: "TimesCtrl"
+	}).when("/reservations", {
+		templateUrl: "reservations.html",
+		controller: "ReservationsCtrl"
+	}).otherwise("/404", {
+		templateUrl: "404.html",
+		controller: "PageCtrl"
+	});
+
+}])
+
+.run(function($http, $rootScope, $q, $modal, $location, userService, currentUser) {
+	var language = window.navigator.userLanguage || window.navigator.language;
+	if (language) {
+		$http({url: '/messages-' + language + '.json'}).success(function(messages) {
+			window.i18n = messages;
+		});
+	}
+
+	$rootScope.$on('$routeChangeStart', function(event, next, current) {
+		if ($location.path() != '/' && $location.path() != '/login') {
+			userService.me({'id': currentUser.id}, function(data) {
+				$rootScope.currentUser = data;
+			}, function(data) {
+				$location.path("/login");
+			});
+		}
+	});
+
+})
+
+.controller('HeaderCtrl', function ($scope, userService, currentUser) {
+
+	$scope.currentUser = currentUser;
+
+})
+
+.controller('PageCtrl', function ($scope, userService, $modal) {
+})
+
+.controller('HomeCtrl', function ($scope, userService, $modal) {
+})
+
+.controller('LoginCtrl', function ($scope, userService, $location, currentUser) {
+
+	$scope.showLogin = true;
+	$scope.loginData = {};
+	$scope.registerData = {};
+
+	$scope.toggle = function() {
+		$scope.showLogin = !$scope.showLogin;
+	},
+
+	$scope.signin = function() {
+		userService.login({}, $scope.loginData, function(data) {
+			currentUser.id = data.id;
+			currentUser.name = data.name;
+			currentUser.status = data.status;
+			$location.path('/reservations');
+		});
+	},
+
+	$scope.registerValid = function() {
+		return $scope.registerData.name && $scope.registerData.email && 
+			$scope.registerData.password && $scope.registerData.password == $scope.registerData.password2;
+	},
+
+	$scope.register = function() {
+		userService.register({}, $scope.registerData, function() {
+			$location.path('/reservations');
+		});
+	}
+
+})
+
+.controller('TimesCtrl', function ($scope, userService, $modal) {
+})
+
+.controller('ReservationsCtrl', function ($scope, userService, $modal) {
+});
+
