@@ -4,6 +4,12 @@
             <div class="col-lg-12 col-md-12">
                 <h3 translate="">Schedule</h3>
             </div>
+
+            <div ng-repeat="time in times">{{time}}</div>
+
+            <button ng-if="currentUser.role == 'ADMIN'" ng-click="schedule()" class="btn btn-default pull-right"><i class="fa fa-plus-circle"></i> Add...</button>
+
+
         </div>
     </div>
 </div>

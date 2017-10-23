@@ -8,14 +8,27 @@ var Time = require('./model/time');
 
 var logger = log4js.getLogger('[routes]');
 
-var sessions = {};
+var tokens = {};
+
+User.create({
+	status: 'VERIFIED',
+	name: 'John Admin',
+	email: 'admin@sauna-abc.cz',
+	password: 'admin',
+	role: 'ADMIN'
+});
 
 module.exports = function (app) {
 
-	// validate
+	// validate token
 	app.get('/rest/auth', function(req, res) {
-		var currentUser = sessions[req.params.id];
-		if (currentUser) res.status(200).send(req.params.id);
+		res.status(401).send({ message: 'not authorized' });
+	});
+	
+	// validate token
+	app.get('/rest/auth/:id', function(req, res) {
+		var user = tokens[req.params.id];
+		if (user) res.status(200).send({ id: req.params.id, name: user.name, status: user.status, role: user.role });
 		else res.status(401).send({ message: 'not authorized' });
 	});
 
@@ -28,8 +41,8 @@ module.exports = function (app) {
 			if (err) throw err;
 			if (user) {
 				sessionId = uuid.v4();
-				sessions[sessionId] = user;
-				res.status(200).send({ id: sessionId, name: user.name, status: user.status, role: user.role });
+				tokens[sessionId] = user;
+				res.status(200).send({ id: sessionId });
 			} else res.status(401).send();
        	});
 	});
@@ -44,13 +57,15 @@ module.exports = function (app) {
 			role: 'USER'
        	}, function (err, user) {
 			if (err) throw err;
-			res.status(201);
-       	});
+			sessionId = uuid.v4();
+			tokens[sessionId] = user;
+			res.status(201).send({ id: sessionId });
+	   });
 	});
 
 	// get times
 	app.get('/rest/times', function(req, res) {
-		Time.find({}, function(err, times) {
+		Time.find(function(err, times) {
 			if (err) throw err;
 			res.status(200).send(times);
 		});
@@ -60,21 +75,31 @@ module.exports = function (app) {
 	app.put('/rest/times', function(req, res) {
 		Time.create(req.body, function(err, times) {
 			if (err) throw err;
-			res.status(200).send(times);
+			res.status(201).send();
 		});
 	});
 	
 	// update time
-	app.post('/rest/times', function(req, res) {
-		Time.findOneAndUpdate(req.body.id, req.body)
-
-
-		Time.save(req.body, function(err, times) {
+	app.post('/rest/times/:id', function(req, res) {
+		Time.findById(req.params.id, function(req, time) {
 			if (err) throw err;
-			res.status(200).send(times);
+			time.date = req.body.date;
+			time.type = req.body.type;
+		}).save(time, function(err, time) {
+			if (err) throw err;
+			res.status(200).send();
 		});
 	});
 
+	// delete time
+	app.delete('/rest/times/:id', function(req, res) {
+		Time.findById(req.params.id, function(req, time) {
+			if (err) throw err;
+		}).delete(function(err, time) {
+			if (err) throw err;
+			res.status(200).send();
+		}); 
+	});
 
 
     app.get('*', function (req, res) {

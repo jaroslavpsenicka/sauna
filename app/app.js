@@ -36,8 +36,10 @@ angular.module('sauna', [
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
 		if ($location.path() != '/' && $location.path() != '/login') {
 			userService.me({'id': currentUser.id}, function(data) {
-				$rootScope.currentUser = data;
-			}, function(data) {
+				currentUser.name = data.name;
+				currentUser.status = data.status;
+				currentUser.role = data.role;
+			}, function(data) {	
 				$location.path("/login");
 			});
 		}
@@ -70,8 +72,6 @@ angular.module('sauna', [
 	$scope.signin = function() {
 		userService.login({}, $scope.loginData, function(data) {
 			currentUser.id = data.id;
-			currentUser.name = data.name;
-			currentUser.status = data.status;
 			$location.path('/reservations');
 		});
 	},
@@ -82,14 +82,22 @@ angular.module('sauna', [
 	},
 
 	$scope.register = function() {
-		userService.register({}, $scope.registerData, function() {
+		userService.register({}, $scope.registerData, function(data) {
+			currentUser.id = data.id;
 			$location.path('/reservations');
 		});
 	}
 
 })
 
-.controller('TimesCtrl', function ($scope, userService, $modal) {
+.controller('TimesCtrl', function ($scope, currentUser, timesService) {
+	
+	$scope.currentUser = currentUser;
+
+	timesService.query({}, function(response) {
+		$scope.times = response;
+	});
+
 })
 
 .controller('ReservationsCtrl', function ($scope, userService, $modal) {
