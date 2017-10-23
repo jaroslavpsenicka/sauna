@@ -7,10 +7,8 @@ var config = require('./config');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var passport = require('passport');
 var log4js = require('log4js');
 var mask = require('mongoosemask');
-var jwt = require('express-jwt');
 
 var logger = log4js.getLogger('[server]');
 

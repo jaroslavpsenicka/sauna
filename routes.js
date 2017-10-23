@@ -4,9 +4,11 @@ var log4js = require('log4js');
 var uuid = require('node-uuid');
 
 var User = require('./model/user');
-var sessions = {};
+var Time = require('./model/time');
 
 var logger = log4js.getLogger('[routes]');
+
+var sessions = {};
 
 module.exports = function (app) {
 
@@ -45,6 +47,35 @@ module.exports = function (app) {
 			res.status(201);
        	});
 	});
+
+	// get times
+	app.get('/rest/times', function(req, res) {
+		Time.find({}, function(err, times) {
+			if (err) throw err;
+			res.status(200).send(times);
+		});
+	});
+
+	// create time
+	app.put('/rest/times', function(req, res) {
+		Time.create(req.body, function(err, times) {
+			if (err) throw err;
+			res.status(200).send(times);
+		});
+	});
+	
+	// update time
+	app.post('/rest/times', function(req, res) {
+		Time.findOneAndUpdate(req.body.id, req.body)
+
+
+		Time.save(req.body, function(err, times) {
+			if (err) throw err;
+			res.status(200).send(times);
+		});
+	});
+
+
 
     app.get('*', function (req, res) {
         res.sendFile(__dirname + '/app/index.html');
