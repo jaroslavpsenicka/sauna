@@ -101,6 +101,36 @@ module.exports = function (app) {
 		}); 
 	});
 
+	// generate random times
+	app.put('/rest/times/generate', function(req, res) {
+		var types = ['MEN', 'WOMEN', 'OPEN'];
+		var times = {};
+		for (var i = 0; i < 50; i++) {
+			Time.create({
+				date: uniqueTime(times),
+				type: types[randomInt(0, 3)]
+			}, function(err, user) {
+				if (err) throw err;
+			});
+		}
+
+		res.status(200).send();
+
+		function uniqueTime(times) {
+			var time = undefined; 
+			do {
+				time = new Date(2017, 11, randomInt(0, 30), randomInt(8, 20), 0, 0, 0);
+			} while(times[time.getTime()]);
+
+			times[time.getTime()] = 1;
+			return time;
+		}
+
+		function randomInt(low, high) {
+			return Math.floor(Math.random() * (high - low) + low);
+		}
+
+	});
 
     app.get('*', function (req, res) {
         res.sendFile(__dirname + '/app/index.html');

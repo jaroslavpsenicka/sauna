@@ -95,9 +95,21 @@ angular.module('sauna', [
 	$scope.currentUser = currentUser;
 
 	timesService.query({}, function(response) {
-		$scope.times = response;
+		$scope.times = {};
+		angular.forEach(response.map(function(time) {
+			return { type: time.type, date: new Date(time.date) };
+		}), function(time) {
+			var date = time.date.getFullYear() + '-' + (time.date.getMonth() + 1) + '-' + time.date.getDate();
+			if (!$scope.times[date]) $scope.times[date] = [];
+			$scope.times[date].push(time);
+		});
 	});
 
+	$scope.keys = function(obj) {
+		return obj ? Object.keys(obj).sort(function(a, b) { 
+			return new Date(a).getTime() - new Date(b).getTime() 
+		}) : [];
+	}
 })
 
 .controller('ReservationsCtrl', function ($scope, userService, $modal) {

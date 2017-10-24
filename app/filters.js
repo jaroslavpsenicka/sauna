@@ -7,6 +7,12 @@ angular.module('sauna.filters', [])
     }
 })
 
+.filter("asDate", function () {
+    return function (input) {
+        return new Date(input);
+    }
+})
+
 .filter('trusted', ['$sce', function($sce) {
     return function(text) {
         return $sce.trustAsHtml(text);
