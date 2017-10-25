@@ -26,6 +26,11 @@ angular.module('sauna.services', ['ngResource'])
 })
 
 .factory('bookingService', function($resource) {
-    return $resource('rest/booking', {id: '@id'}, {
+    return $resource('rest/booking', {}, {
+        find: {
+            url: 'rest/booking',
+            method: 'POST',
+            isArray: true
+        },
     });
 });

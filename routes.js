@@ -110,8 +110,15 @@ module.exports = function (app) {
 			Time.create({
 				date: uniqueTime(times),
 				type: types[randomInt(0, 3)]
-			}, function(err, user) {
+			}, function(err, time) {
 				if (err) throw err;
+				var bookings = randomInt(0, 5);
+				for (var i = 0; i < bookings; i++) {
+					var user = ['John Doe', 'Mary Doe', 'Jane Doe'][randomInt(0, 3)];
+					Booking.create({timeRef: time, createdBy: user, createdAt: new Date()}, function(err, time) {
+						if (err) throw err;
+					});
+				}
 			});
 		}
 
@@ -120,7 +127,7 @@ module.exports = function (app) {
 		function uniqueTime(times) {
 			var time = undefined; 
 			do {
-				time = new Date(2017, 11, randomInt(0, 30), randomInt(8, 20), 0, 0, 0);
+				time = new Date(2017, 11, randomInt(1, 15), randomInt(8, 20), 0, 0, 0);
 			} while(times[time.getTime()]);
 
 			times[time.getTime()] = 1;
@@ -133,11 +140,12 @@ module.exports = function (app) {
 
 	});
 
-	// get all bookings relevant to given time ids
-	app.get('/rest/booking', function(req, res) {
-		return res.status(200).send(req.body.ids.map(function(id) {
-			return Booking.find({timeRef: id}, function(err, booking));
-		}));
+	// return all bookings relevant to given time ids
+	app.post('/rest/booking', function(req, res) {
+		Booking.find({ 'timeRef': {$in: req.body.ids }}, function(err, booking) {
+			if (err) throw err;
+			return res.status(200).send(booking);
+		});
 	});
 
     app.get('*', function (req, res) {

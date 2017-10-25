@@ -97,17 +97,21 @@ angular.module('sauna', [
 	timesService.query({}, function(response) {
 		var timeIds = [];
 		$scope.times = {};
+		$scope.bookings = {};
 		angular.forEach(response.map(function(time) {
-			return { type: time.type, date: new Date(time.date) };
+			return { id: time._id, type: time.type, date: new Date(time.date) };
 		}), function(time) {
 			var date = time.date.getFullYear() + '-' + (time.date.getMonth() + 1) + '-' + time.date.getDate();
 			if (!$scope.times[date]) $scope.times[date] = [];
 			$scope.times[date].push(time);
-			timeIds.push(time._id);
+			timeIds.push(time.id);
 		});
 
-		bookingService.query({}, { ids: timeIds }, function(data) {
-			
+		bookingService.find({}, { ids: timeIds }, function(data) {
+			angular.forEach(data, function(booking) {
+				if (!$scope.bookings[booking.timeRef]) $scope.bookings[booking.timeRef] = 0;
+				$scope.bookings[booking.timeRef] = $scope.bookings[booking.timeRef] + 1;
+			});
 		});
 	});
 
