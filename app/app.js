@@ -90,11 +90,12 @@ angular.module('sauna', [
 
 })
 
-.controller('TimesCtrl', function ($scope, currentUser, timesService) {
+.controller('TimesCtrl', function ($scope, $modal, currentUser, timesService, bookingService) {
 	
 	$scope.currentUser = currentUser;
 
 	timesService.query({}, function(response) {
+		var timeIds = [];
 		$scope.times = {};
 		angular.forEach(response.map(function(time) {
 			return { type: time.type, date: new Date(time.date) };
@@ -102,6 +103,11 @@ angular.module('sauna', [
 			var date = time.date.getFullYear() + '-' + (time.date.getMonth() + 1) + '-' + time.date.getDate();
 			if (!$scope.times[date]) $scope.times[date] = [];
 			$scope.times[date].push(time);
+			timeIds.push(time._id);
+		});
+
+		bookingService.query({}, { ids: timeIds }, function(data) {
+			
 		});
 	});
 
@@ -109,7 +115,12 @@ angular.module('sauna', [
 		return obj ? Object.keys(obj).sort(function(a, b) { 
 			return new Date(a).getTime() - new Date(b).getTime() 
 		}) : [];
-	}
+	};
+
+	$scope.bookTime = function(time) {
+
+
+	};
 })
 
 .controller('ReservationsCtrl', function ($scope, userService, $modal) {

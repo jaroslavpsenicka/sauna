@@ -7,7 +7,7 @@
 
             <div ng-repeat="day in keys(times) | orderBy:'day'" class="spaced col-lg-12 col-md-12">
                 <h4>{{day | asDate | date:'MMM dd'}}</h4>
-                <a ng-repeat="time in times[day] | orderBy:'date'" class="btn btn-sq btn-default right-bottom-spaced">
+                <a ng-repeat="time in times[day] | orderBy:'date'" ng-click="bookTime(time)" class="btn btn-sq btn-default right-bottom-spaced">
                     <i ng-class="time.type == 'MEN' ? 'fa-male' : time.type == 'WOMEN' ? 'fa-female' : 'fa-question-circle'" class="fa fa-3x"></i>
                     <br/><br/>{{time.date | date:'H:mm'}}
                 </a>

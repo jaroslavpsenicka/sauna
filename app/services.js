@@ -23,4 +23,9 @@ angular.module('sauna.services', ['ngResource'])
 .factory('timesService', function($resource) {
     return $resource('rest/times', {id: '@id'}, {
     });
+})
+
+.factory('bookingService', function($resource) {
+    return $resource('rest/booking', {id: '@id'}, {
+    });
 });

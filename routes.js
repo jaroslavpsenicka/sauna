@@ -5,6 +5,7 @@ var uuid = require('node-uuid');
 
 var User = require('./model/user');
 var Time = require('./model/time');
+var Booking = require('./model/booking');
 
 var logger = log4js.getLogger('[routes]');
 
@@ -130,6 +131,13 @@ module.exports = function (app) {
 			return Math.floor(Math.random() * (high - low) + low);
 		}
 
+	});
+
+	// get all bookings relevant to given time ids
+	app.get('/rest/booking', function(req, res) {
+		return res.status(200).send(req.body.ids.map(function(id) {
+			return Booking.find({timeRef: id}, function(err, booking));
+		}));
 	});
 
     app.get('*', function (req, res) {
