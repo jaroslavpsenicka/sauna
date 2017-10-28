@@ -1,0 +1,17 @@
+<div id="welcome-header" class="modal-header">
+    <h3 translate>Book {{time.date | date:'MMM dd, HH:mm'}}</h3>
+</div>
+<form name="form" class="form-horizontal" role="form" ng-submit="submit()">
+    <div class="modal-body">
+        <p>
+            <span>Thank you for booking the time. Please note - </span>
+            <span ng-show="time.type == 'MEN'">the time is marked as men only, women may not be allowed to enter.</span>
+            <span ng-show="time.type == 'WOMEN'">the time is marked as women only, men may not be allowed to enter.</span>
+            <span ng-show="time.type == 'OPEN'">the time is marked as open, both men and women may join the time.</span>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-ng-click="$dismiss('cancel')">Cancel</button>
+        <button type="submit" class="btn btn-primary" translate>OK, Join</button>
+    </div>
+</form>

@@ -1,11 +1,11 @@
 <div id="welcome-header" class="modal-header">
-    <h3 translate>Error submitting the order</h3>
+    <h3 translate>Error booking the time</h3>
 </div>
 <form name="form" class="form-horizontal" role="form" ng-submit="submit()">
     <div class="modal-body">
-        <p translate>The order cannot be processed. You may try to re-submit the order or use email. Sorry about that.</p>
+        <p translate>We are sorry, but the time cannot be booked, {{reason}}. Please contact the sauna service for further information.</p>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" ng-disabled="form.$invalid" translate>Retry</button>
+        <button type="submit" class="btn btn-primary" translate>Dismiss</button>
     </div>
 </form>

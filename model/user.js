@@ -1,6 +1,10 @@
 var mongoose = require('mongoose');
 
 module.exports = mongoose.model('User', {
+	_id: {
+		type: mongoose.Schema.Types.ObjectId,
+		required: true
+	},
 	status: {
     	type: String,
     	enum: ['NEW', 'VERIFIED', 'BANNED'],

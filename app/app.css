@@ -130,3 +130,7 @@ body {
   height: 25px !important;
   padding:2px;
 }
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}

@@ -1,0 +1,35 @@
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <h3 translate="">Booking</h3>
+                <p ng-show="!times || times.length == 0">No booking, you may want to <a href="#/times">schedule some times</a>.</p>
+                <table ng-show="times && times.length > 0" class="table">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1"></th>
+                            <th class="col-md-2">Time</th>
+                            <th class="col-md-6">For</th>
+                            <th class="col-md-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="time in times | orderBy: 'date'">
+                            <td class="text-center">
+                                <i ng-class="time.type == 'MEN' ? 'fa-male' : time.type == 'WOMEN' ? 'fa-female' : 'fa-question-circle'" 
+                                    class="fa fa-2x"></i>
+                            </td>
+                            <td>{{time.date | date:'MMM dd, HH:mm'}}</td>
+                            <td>
+                                <span ng-repeat="user in time.booking">{{user}}{{$last ? '' : ', '}}</span>
+                            </td>
+                            <td class="text-right">    
+                                <a href ng-click="cancelTime(time)">Cancel time</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>  
+        </div>
+    </div>
+</div>

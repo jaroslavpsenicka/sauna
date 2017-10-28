@@ -5,9 +5,9 @@ angular.module('sauna.services', ['ngResource'])
 .factory('userService', function($resource) {
     return $resource('', {}, {
         me: {
-            url: 'rest/auth/:id',
+            url: 'rest/auth/:token',
             method: 'GET',
-            params: { id: '@id' }
+            params: { token: '@token' }
         },
         login: {
             url: 'rest/auth',
@@ -27,10 +27,36 @@ angular.module('sauna.services', ['ngResource'])
 
 .factory('bookingService', function($resource) {
     return $resource('rest/booking', {}, {
-        find: {
-            url: 'rest/booking',
+        findAll: {
             method: 'POST',
             isArray: true
         },
+        create: {
+            method: 'PUT',
+            isArray: true
+        },
+        findMine: {
+            url: 'rest/booking/:token',
+            method: 'GET',
+            params: { token: '@token' },
+            isArray: true
+        },
+        findAdmin: {
+            url: 'rest/admin/booking/:token',
+            method: 'GET',
+            params: { token: '@token' },
+            isArray: true
+        },
+        cancel: {
+            url: 'rest/booking/:token/:id',
+            method: 'DELETE',
+            params: { id: '@id', token: '@token' }
+        }
     });
+})
+
+.factory('errorHandler', function() {
+    return function(error) {
+        console.log('ERROR: ', error);
+    }
 });

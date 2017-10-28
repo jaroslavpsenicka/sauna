@@ -1,7 +1,7 @@
 
 angular.module('sauna', [
   'sauna.services', 'sauna.filters', 'pascalprecht.translate',
-  'ui.bootstrap', 'ngRoute', 'ngAnimate'
+  'ui.bootstrap', 'ngRoute', 'ngAnimate', 'ngResource'
 ])
 
 .config(['$routeProvider', function ($routeProvider) {
@@ -15,9 +15,12 @@ angular.module('sauna', [
 	}).when("/times", {
 		templateUrl: "times.html",
 		controller: "TimesCtrl"
-	}).when("/reservations", {
-		templateUrl: "reservations.html",
-		controller: "ReservationsCtrl"
+	}).when("/booking", {
+		templateUrl: "booking.html",
+		controller: "BookingCtrl"
+	}).when("/my", {
+		templateUrl: "my.html",
+		controller: "MyCtrl"
 	}).otherwise("/404", {
 		templateUrl: "404.html",
 		controller: "PageCtrl"
@@ -25,7 +28,7 @@ angular.module('sauna', [
 
 }])
 
-.run(function($http, $rootScope, $q, $modal, $location, userService, currentUser) {
+.run(function($http, $rootScope, $q, $location, userService, currentUser) {
 	var language = window.navigator.userLanguage || window.navigator.language;
 	if (language) {
 		$http({url: '/messages-' + language + '.json'}).success(function(messages) {
@@ -33,13 +36,13 @@ angular.module('sauna', [
 		});
 	}
 
-	$rootScope.$on('$routeChangeStart', function(event, next, current) {
+	$rootScope.$on('$routeChangeStart', function() {
 		if ($location.path() != '/' && $location.path() != '/login') {
-			userService.me({'id': currentUser.id}, function(data) {
+			userService.me({'token': currentUser.token}, function(data) {
 				currentUser.name = data.name;
 				currentUser.status = data.status;
 				currentUser.role = data.role;
-			}, function(data) {	
+			}, function() {	
 				$location.path("/login");
 			});
 		}
@@ -53,10 +56,10 @@ angular.module('sauna', [
 
 })
 
-.controller('PageCtrl', function ($scope, userService, $modal) {
+.controller('PageCtrl', function ($scope) {
 })
 
-.controller('HomeCtrl', function ($scope, userService, $modal) {
+.controller('HomeCtrl', function ($scope) {
 })
 
 .controller('LoginCtrl', function ($scope, userService, $location, currentUser) {
@@ -71,8 +74,8 @@ angular.module('sauna', [
 
 	$scope.signin = function() {
 		userService.login({}, $scope.loginData, function(data) {
-			currentUser.id = data.id;
-			$location.path('/reservations');
+			currentUser.token = data.token;
+			$location.path('/my');
 		});
 	},
 
@@ -83,16 +86,17 @@ angular.module('sauna', [
 
 	$scope.register = function() {
 		userService.register({}, $scope.registerData, function(data) {
-			currentUser.id = data.id;
-			$location.path('/reservations');
+			currentUser.token = data.token;
+			$location.path('/my');
 		});
 	}
 
 })
 
-.controller('TimesCtrl', function ($scope, $modal, currentUser, timesService, bookingService) {
+.controller('TimesCtrl', function ($scope, $uibModal, currentUser, timesService, bookingService, errorHandler) {
 	
 	$scope.currentUser = currentUser;
+	$scope.myTimes = {};
 
 	timesService.query({}, function(response) {
 		var timeIds = [];
@@ -107,13 +111,22 @@ angular.module('sauna', [
 			timeIds.push(time.id);
 		});
 
-		bookingService.find({}, { ids: timeIds }, function(data) {
+		bookingService.findAll({}, { ids: timeIds }, function(data) {
 			angular.forEach(data, function(booking) {
 				if (!$scope.bookings[booking.timeRef]) $scope.bookings[booking.timeRef] = 0;
 				$scope.bookings[booking.timeRef] = $scope.bookings[booking.timeRef] + 1;
 			});
 		});
 	});
+
+	$scope.loadMyTimes = function() {
+		bookingService.findMine({ token: currentUser.token }, {}, function(data) {
+			$scope.myTimes = {};
+			data.forEach(function(time) {
+				$scope.myTimes[time._id] = time;
+			});
+		});	
+	};
 
 	$scope.keys = function(obj) {
 		return obj ? Object.keys(obj).sort(function(a, b) { 
@@ -122,11 +135,86 @@ angular.module('sauna', [
 	};
 
 	$scope.bookTime = function(time) {
-
-
+		$uibModal.open({
+			templateUrl: 'comp/book.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.time = time;
+				$scope.submit = function () {
+					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+				};
+			}
+		}).result.then(function() {
+			var booking = { timeRef: time.id, userToken: currentUser.token };
+			bookingService.create({}, booking, function(response) {
+				$scope.bookings[booking.timeRef] = response.length;
+				$scope.loadMyTimes();
+			}, function(response) {
+				if (response.status > 500) errorHandler(response);
+				else $uibModal.open({
+					templateUrl: 'comp/error.tpl.html',
+					controller: function ($scope, $uibModalInstance) {
+						$scope.reason = response.data.error;
+						$scope.submit = function () {
+							$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+						};
+					}
+				});
+			});
+		});
 	};
+
+	$scope.loadMyTimes();
 })
 
-.controller('ReservationsCtrl', function ($scope, userService, $modal) {
+.controller('BookingCtrl', function ($scope, $uibModal, currentUser, bookingService) {
+	
+	bookingService.findAdmin({ token: currentUser.token }, {}, function(data) {
+		$scope.times = data;
+	});
+
+	$scope.cancelTime = function(time) {
+		$uibModal.open({
+			templateUrl: 'comp/cancel-admin.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.time = time;
+				$scope.submit = function () {
+					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+				};
+			}
+		}).result.then(function() {
+			bookingService.cancel({ token: currentUser.token, id: time._id }, {}, function() {
+				bookingService.findAdmin({ token: currentUser.token }, {}, function(data) {
+					$scope.times = data;
+				});
+			});
+		});
+	};
+	
+})
+	
+.controller('MyCtrl', function ($scope, $uibModal, currentUser, bookingService) {
+
+	bookingService.findMine({ token: currentUser.token }, {}, function(data) {
+		$scope.times = data;
+	});
+
+	$scope.cancelTime = function(time) {
+		$uibModal.open({
+			templateUrl: 'comp/cancel.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.time = time;
+				$scope.submit = function () {
+					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+				};
+			}
+		}).result.then(function() {
+			bookingService.cancel({ token: currentUser.token, id: time._id }, {}, function() {
+				bookingService.findMine({ token: currentUser.token }, {}, function(data) {
+					$scope.times = data;
+				});
+			});
+		});
+	};
+
 });
 

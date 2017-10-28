@@ -1,0 +1,12 @@
+<div id="welcome-header" class="modal-header">
+    <h3 translate>Cancel {{time.date | date:'MMM dd, HH:mm'}}</h3>
+</div>
+<form name="form" class="form-horizontal" role="form" ng-submit="submit()">
+    <div class="modal-body">
+        <p translate>Are you sure you want to cancel your booking?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-ng-click="$dismiss('cancel')">No, keep it</button>
+        <button type="submit" class="btn btn-warning" translate>Yes, cancel it</button>
+    </div>
+</form>

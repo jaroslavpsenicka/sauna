@@ -1,0 +1,32 @@
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <h3 translate="">My booking</h3>
+                <p ng-show="!times || times.length == 0">No booking, please navigate to <a href="#/times">schedule page</a>
+                    a to create one.</p>
+                <table ng-show="times && times.length > 0" class="table">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1"></th>
+                            <th class="col-md-8">Time</th>
+                            <th class="col-md-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="time in times | orderBy: 'date'">
+                            <td class="text-center">
+                                <i ng-class="time.type == 'MEN' ? 'fa-male' : time.type == 'WOMEN' ? 'fa-female' : 'fa-question-circle'" 
+                                    class="fa fa-2x"></i>
+                            </td>
+                            <td>{{time.date | date:'MMM dd, HH:mm'}}</td>
+                            <td class="text-right">    
+                                <a href ng-click="cancelTime(time)">Cancel booking</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>  
+        </div>
+    </div>
+</div>

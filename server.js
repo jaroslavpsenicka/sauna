@@ -22,6 +22,7 @@ server.use(bodyParser.urlencoded({ 'extended': 'true' })); // parse application/
 server.use(bodyParser.json()); // parse application/json
 server.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 server.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
+// server.use(mask(['_id', '__v']));
 server.use(function(err, req, res, next) {
   res.status(500);
   res.render('error', { error: err });
