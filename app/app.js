@@ -190,6 +190,10 @@ angular.module('sauna', [
 		});
 	};
 	
+	$scope.confirmUser = function(user) {
+		
+	}
+
 })
 	
 .controller('MyCtrl', function ($scope, $uibModal, currentUser, bookingService) {

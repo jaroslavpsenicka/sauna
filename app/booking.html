@@ -21,7 +21,9 @@
                             </td>
                             <td>{{time.date | date:'MMM dd, HH:mm'}}</td>
                             <td>
-                                <span ng-repeat="user in time.booking">{{user}}{{$last ? '' : ', '}}</span>
+                                <span ng-repeat="user in time.booking">
+                                    <a href ng-click="confirm(user)">{{user.name}}</a>{{$last ? '' : ', '}}
+                                </span>
                             </td>
                             <td class="text-right">    
                                 <a href ng-click="cancelTime(time)">Cancel time</a>

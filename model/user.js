@@ -24,7 +24,7 @@ module.exports = mongoose.model('User', {
 	},
 	role: {
 		type: String,
-    	enum: ['USER', 'RECEPTIONIST', 'ADMIN'],
+    	enum: ['USER', 'RECEPTION', 'ADMIN'],
 		required: true
 	}
 });

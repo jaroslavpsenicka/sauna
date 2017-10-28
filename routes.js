@@ -172,7 +172,7 @@ module.exports = function (app) {
 		var user = tokens[req.params.userToken];
 		if (!user) return res.status(400).send({error: "the user is not known"});			
 
-		if (user.role != 'ADMIN') return res.status(403).send({error: "not accessible"});
+		if (user.role != 'ADMIN' || user.role != 'RECEPTION') return res.status(403).send({error: "not accessible"});
 		User.find({}, function(err, users) {
 			var userMap = {};
 			users.forEach(function(user) { userMap[user.id] = user });
@@ -193,7 +193,7 @@ module.exports = function (app) {
 					var completeTimes = [];
 					var byUser = function(booking) {
 						var user = userMap[booking.createdBy];
-						return user ? user.name : 'Unknown'
+						return user ? { id: user.id, name: user.name } : { name: 'Unknown' }
 					}
 					times.forEach(function(time) {
 						completeTimes.push({ _id: time._id, date: time.date, type: time.type, booking: bookingMap[time.id].map(byUser) });
