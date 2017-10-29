@@ -16,6 +16,9 @@ module.exports = mongoose.model('Booking', {
 		type: Date,
 		required: true
 	},
+	confirmedAt: {
+		type: Date
+	},
 	cancelledAt: {
 		type: Date
 	}

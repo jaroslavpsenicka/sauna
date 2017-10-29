@@ -8,8 +8,8 @@
                     <thead>
                         <tr>
                             <th class="col-md-1"></th>
-                            <th class="col-md-2">Time</th>
-                            <th class="col-md-6">For</th>
+                            <th class="col-md-2" translate>Time</th>
+                            <th class="col-md-6" translate>For</th>
                             <th class="col-md-3"></th>
                         </tr>
                     </thead>
@@ -22,11 +22,12 @@
                             <td>{{time.date | date:'MMM dd, HH:mm'}}</td>
                             <td>
                                 <span ng-repeat="user in time.booking">
-                                    <a href ng-click="confirm(user)">{{user.name}}</a>{{$last ? '' : ', '}}
+                                    <span ng-show="user.status == 'NEW'"><i class="fa fa-star-o"></i>&nbsp;</span>
+                                    <a href ng-click="confirmUser(user, time)">{{user.name}}</a>{{$last ? '' : ', '}}
                                 </span>
                             </td>
                             <td class="text-right">    
-                                <a href ng-click="cancelTime(time)">Cancel time</a>
+                                <a href ng-show="currentUser.role == 'ADMIN'" ng-click="cancelTime(time)" translate>Cancel time</a>
                             </td>
                         </tr>
                     </tbody>

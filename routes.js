@@ -21,6 +21,8 @@ User.remove({}, function(err) {
 	User.create({ _id: new ObjectId("507f1f77bcf86cd799439013"), 
 		status: 'NEW', name: 'Julia New', email: 'julia@sauna-abc.cz',	password: 'password', role: 'USER' });	
 	User.create({ _id: new ObjectId("507f1f77bcf86cd799439014"), 
+		status: 'VERIFIED', name: 'Tom Receptionist', email: 'tom@sauna-abc.cz', password: 'password', role: 'RECEPTION' });	
+	User.create({ _id: new ObjectId("507f1f77bcf86cd799439015"), 
 		status: 'BANNED', name: 'Frank Banned', email: 'frank@sauna-abc.cz', password: 'password', role: 'USER' });	
 });
 
@@ -48,7 +50,7 @@ module.exports = function (app) {
 			if (user) {
 				var token = uuid.v4();
 				tokens[token] = user;
-				res.status(200).send({ "token": token });
+				res.status(200).send({ token: token, name: user.name, status: user.status, role: user.role });
 			} else res.status(401).send();
        	});
 	});
@@ -171,8 +173,7 @@ module.exports = function (app) {
 	app.get('/rest/admin/booking/:userToken', function(req, res) {
 		var user = tokens[req.params.userToken];
 		if (!user) return res.status(400).send({error: "the user is not known"});			
-
-		if (user.role != 'ADMIN' || user.role != 'RECEPTION') return res.status(403).send({error: "not accessible"});
+		if (user.role != 'ADMIN' && user.role != 'RECEPTION') return res.status(403).send({error: "not accessible"});
 		User.find({}, function(err, users) {
 			var userMap = {};
 			users.forEach(function(user) { userMap[user.id] = user });
@@ -192,8 +193,7 @@ module.exports = function (app) {
 					if (err) throw err;
 					var completeTimes = [];
 					var byUser = function(booking) {
-						var user = userMap[booking.createdBy];
-						return user ? { id: user.id, name: user.name } : { name: 'Unknown' }
+						return userMap[booking.createdBy] || { name: 'Unknown' };
 					}
 					times.forEach(function(time) {
 						completeTimes.push({ _id: time._id, date: time.date, type: time.type, booking: bookingMap[time.id].map(byUser) });
@@ -205,6 +205,30 @@ module.exports = function (app) {
 		});
 	});
 	
+	// confirm user for given time
+	app.post('/rest/admin/confirm/:userToken/:user/:time', function(req, res) {
+		var user = tokens[req.params.userToken];
+		if (!user) return res.status(400).send({error: "the user is not known"});			
+		if (user.role != 'ADMIN' && user.role != 'RECEPTION') return res.status(403).send({error: "not accessible"});		
+		User.findById(req.params.user, function(err, user) {
+			if (err) throw err;
+			if (user.status == 'NEW') {
+				user.status = 'VERIFIED';
+				user.save(function(err) {
+					if (err) throw err;
+				});				
+			}
+
+			Booking.findOne({ 'timeRef': req.params.time, 'createdBy': req.params.user }, function(req, booking) {
+				booking.confirmedAt = new Date();
+				booking.save(function(err) {
+					if (err) throw err;
+					return res.status(200).send();
+				});	
+			});
+		});
+	});
+		
 	// return all booking relevant to given time ids
 	app.post('/rest/booking', function(req, res) {
 		Booking.find({ 'timeRef': {$in: req.body.ids }}, function(err, booking) {

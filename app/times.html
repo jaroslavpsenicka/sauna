@@ -6,7 +6,7 @@
             </div>
 
             <div ng-repeat="day in keys(times) | orderBy:'day'" class="spaced col-lg-12 col-md-12">
-                <h4>{{day | asDate | date:'MMM dd'}}</h4>
+                <h4 translate>{{day | asDate | date:'MMM dd'}}</h4>
                 <a ng-repeat="time in times[day] | orderBy:'date'" ng-click="bookTime(time)" ng-disabled="bookings[time.id] == 4 || myTimes[time.id]" 
                     class="btn btn-sq right-bottom-spaced" ng-class="myTimes[time.id] ? 'btn-success' : 'btn-default'">
                     <i ng-class="time.type == 'MEN' ? 'fa-male' : time.type == 'WOMEN' ? 'fa-female' : 'fa-question-circle'" class="fa fa-3x"></i>

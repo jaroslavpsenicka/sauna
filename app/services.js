@@ -15,7 +15,7 @@ angular.module('sauna.services', ['ngResource'])
         },
         register: {
             url: 'rest/auth/register',
-            method: 'POST',
+            method: 'POST'
         }
     });
 })
@@ -41,16 +41,21 @@ angular.module('sauna.services', ['ngResource'])
             params: { token: '@token' },
             isArray: true
         },
+        cancel: {
+            url: 'rest/booking/:token/:id',
+            method: 'DELETE',
+            params: { id: '@id', token: '@token' }
+        },
         findAdmin: {
             url: 'rest/admin/booking/:token',
             method: 'GET',
             params: { token: '@token' },
             isArray: true
         },
-        cancel: {
-            url: 'rest/booking/:token/:id',
-            method: 'DELETE',
-            params: { id: '@id', token: '@token' }
+        confirm: {
+            url: 'rest/admin/confirm/:token/:userId/:timeId',
+            method: 'POST',
+            params: { token: '@token', userId: '@userId', timeId: "@timeId" }
         }
     });
 })

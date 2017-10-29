@@ -1,0 +1,15 @@
+<div id="welcome-header" class="modal-header">
+    <h3 translate>Confirm {{user.name}}</h3>
+</div>
+<form name="form" class="form-horizontal" role="form" ng-submit="submit()">
+    <div class="modal-body">
+        <p>
+            <span>Confirming user attendance. </span>
+            <span ng-show="user.status == 'NEW'">Please note - the user is not yet verified.</span>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-ng-click="$dismiss('cancel')">Cancel</button>
+        <button type="submit" class="btn btn-primary" translate>Confirm</button>
+    </div>
+</form>

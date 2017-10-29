@@ -4,29 +4,72 @@ angular.module('sauna', [
   'ui.bootstrap', 'ngRoute', 'ngAnimate', 'ngResource'
 ])
 
-.config(['$routeProvider', function ($routeProvider) {
+.config(function ($routeProvider, $translateProvider) {
 
+	var translateFn = function($translate, $route) {
+        if ($route.current.params.translate) {
+            $translate.use($route.current.params.translate);
+        }
+	};
+	
 	$routeProvider.when("/", {
 		templateUrl: "home.html",
-		controller: "HomeCtrl"
+		controller: "HomeCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	}).when("/login", {
 		templateUrl: "login.html",
-		controller: "LoginCtrl"
+		controller: "LoginCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	}).when("/times", {
 		templateUrl: "times.html",
-		controller: "TimesCtrl"
+		controller: "TimesCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	}).when("/booking", {
 		templateUrl: "booking.html",
-		controller: "BookingCtrl"
+		controller: "BookingCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	}).when("/my", {
 		templateUrl: "my.html",
-		controller: "MyCtrl"
+		controller: "MyCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	}).otherwise("/404", {
 		templateUrl: "404.html",
-		controller: "PageCtrl"
+		controller: "PageCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	});
 
-}])
+	$translateProvider.useLoader('messagesLoader', {});
+	$translateProvider.preferredLanguage('cz');
+	$translateProvider.useSanitizeValueStrategy(null);
+})
+
+.factory('messagesLoader', function ($http, $q) {
+    return function(options) {
+		var deferred = $q.defer();
+		$http({
+			method:'GET',
+			url: 'messages-' + options.key + '.json'
+		}).success(function (data) {
+			deferred.resolve(data);
+		}).error(function () {
+			deferred.reject(options.key);
+		});
+
+    	return deferred.promise;
+    }
+})
 
 .run(function($http, $rootScope, $q, $location, userService, currentUser) {
 	var language = window.navigator.userLanguage || window.navigator.language;
@@ -50,10 +93,18 @@ angular.module('sauna', [
 
 })
 
-.controller('HeaderCtrl', function ($scope, userService, currentUser) {
-
+.controller('HeaderCtrl', function ($scope, $translate, $location, $route, $http, currentUser) {
 	$scope.currentUser = currentUser;
-
+    $scope.tran = $translate.use();
+	$scope.useLanguage = function(language) {
+		$translate.use(language).then(function() {
+			$location.path('/');
+			$http({url: '/messages-' + language + '.json'}).success(function(messages) {
+				window.i18n = messages;
+				$route.reload();
+			});
+		});
+	};
 })
 
 .controller('PageCtrl', function ($scope) {
@@ -166,8 +217,10 @@ angular.module('sauna', [
 	$scope.loadMyTimes();
 })
 
-.controller('BookingCtrl', function ($scope, $uibModal, currentUser, bookingService) {
+.controller('BookingCtrl', function ($scope, $uibModal, currentUser, userService, bookingService) {
 	
+	$scope.currentUser = currentUser;
+
 	bookingService.findAdmin({ token: currentUser.token }, {}, function(data) {
 		$scope.times = data;
 	});
@@ -190,8 +243,22 @@ angular.module('sauna', [
 		});
 	};
 	
-	$scope.confirmUser = function(user) {
-		
+	$scope.confirmUser = function(user, time) {
+		$uibModal.open({
+			templateUrl: 'comp/confirm.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.user = user;
+				$scope.submit = function () {
+					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+				};
+			}
+		}).result.then(function() {
+			bookingService.confirm({ token: currentUser.token, userId: user._id, timeId: time._id }, {}, function() {
+				bookingService.findAdmin({ token: currentUser.token }, {}, function(data) {
+					$scope.times = data;
+				});
+			});
+		});
 	}
 
 })
