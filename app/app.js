@@ -170,6 +170,11 @@ angular.module('sauna', [
 		});
 	});
 
+	$scope.timeDisabled = function(time) {
+		if (currentUser.role == 'ADMIN') return false;
+		return $scope.bookings[time.id] == 4 || $scope.myTimes[time.id]
+	}
+
 	$scope.loadMyTimes = function() {
 		bookingService.findMine({ token: currentUser.token }, {}, function(data) {
 			$scope.myTimes = {};
@@ -186,33 +191,49 @@ angular.module('sauna', [
 	};
 
 	$scope.bookTime = function(time) {
+		var myTimes = $scope.myTimes;
 		$uibModal.open({
 			templateUrl: 'comp/book.tpl.html',
 			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.currentUser = currentUser;
 				$scope.time = time;
+				$scope.myTimes = myTimes;
 				$scope.submit = function () {
 					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
 				};
 			}
-		}).result.then(function() {
-			var booking = { timeRef: time.id, userToken: currentUser.token };
-			bookingService.create({}, booking, function(response) {
-				$scope.bookings[booking.timeRef] = response.length;
-				$scope.loadMyTimes();
-			}, function(response) {
-				if (response.status > 500) errorHandler(response);
-				else $uibModal.open({
-					templateUrl: 'comp/error.tpl.html',
-					controller: function ($scope, $uibModalInstance) {
-						$scope.reason = response.data.error;
-						$scope.submit = function () {
-							$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
-						};
-					}
-				});
-			});
+		}).result.then(function(operation) {
+			if (operation == 'remove') cancelTime(time);
+			else if (operation == 'ok') bookTime(time);
 		});
 	};
+
+	var bookTime = function(time) {
+		var booking = { timeRef: time.id, userToken: currentUser.token };
+		bookingService.create({}, booking, function(response) {
+			$scope.bookings[booking.timeRef] = response.length;
+			$scope.loadMyTimes();
+		}, function(response) {
+			if (response.status > 500) errorHandler(response);
+			else $uibModal.open({
+				templateUrl: 'comp/error.tpl.html',
+				controller: function ($scope, $uibModalInstance) {
+					$scope.reason = response.data.error;
+					$scope.submit = function () {
+						$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+					};
+				}
+			});
+		});
+	}
+
+	var cancelTime = function(time) {
+		bookingService.cancel({ token: currentUser.token, id: time._id }, {}, function() {
+			bookingService.findAdmin({ token: currentUser.token }, {}, function(data) {
+				$scope.loadMyTimes();
+			});
+		});
+	}
 
 	$scope.loadMyTimes();
 })

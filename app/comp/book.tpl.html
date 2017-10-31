@@ -11,7 +11,10 @@
         </p>
     </div>
     <div class="modal-footer">
+        <button ng-show="currentUser.role == 'ADMIN'" type="button" class="btn btn-warning pull-left" 
+            data-ng-click="$close('remove')" translate>Cancel Time</button>
         <button type="button" class="btn btn-default" data-ng-click="$dismiss('cancel')">Cancel</button>
-        <button type="submit" class="btn btn-primary" translate>OK, Join</button>
+        <button type="button" class="btn btn-primary" translate data-ng-click="$close('ok')" 
+            ng-disabled="myTimes[time.id]">OK, Join</button>
     </div>
 </form>

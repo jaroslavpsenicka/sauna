@@ -22,12 +22,11 @@
                             <td>{{time.date | date:'MMM dd, HH:mm'}}</td>
                             <td>
                                 <span ng-repeat="user in time.booking">
-                                    <span ng-show="user.status == 'NEW'"><i class="fa fa-star-o"></i>&nbsp;</span>
-                                    <a href ng-click="confirmUser(user, time)">{{user.name}}</a>{{$last ? '' : ', '}}
+                                    <a href ng-click="confirmUser(user)">{{user.name}}</a>{{$last ? '' : ', '}}
                                 </span>
                             </td>
                             <td class="text-right">    
-                                <a href ng-show="currentUser.role == 'ADMIN'" ng-click="cancelTime(time)" translate>Cancel time</a>
+                                <a href ng-click="cancelTime(time)">Cancel time</a>
                             </td>
                         </tr>
                     </tbody>
