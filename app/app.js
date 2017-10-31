@@ -190,6 +190,22 @@ angular.module('sauna', [
 		}) : [];
 	};
 
+	$scope.addTime = function() {
+		$uibModal.open({
+			templateUrl: 'comp/add-time.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.time = { date: new Date(), type: 'OPEN'}
+				$scope.submit = function () {
+					$uibModalInstance.close(time);
+				};
+			}
+		}).result.then(function(time) {
+			timesService.create({}, time, function() {
+				$scope.loadMyTimes();
+			});
+		});
+	};
+
 	$scope.bookTime = function(time) {
 		var myTimes = $scope.myTimes;
 		$uibModal.open({
@@ -199,7 +215,7 @@ angular.module('sauna', [
 				$scope.time = time;
 				$scope.myTimes = myTimes;
 				$scope.submit = function () {
-					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+					$uibModalInstance.close();
 				};
 			}
 		}).result.then(function(operation) {
@@ -220,7 +236,7 @@ angular.module('sauna', [
 				controller: function ($scope, $uibModalInstance) {
 					$scope.reason = response.data.error;
 					$scope.submit = function () {
-						$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+						$uibModalInstance.close();
 					};
 				}
 			});
@@ -252,7 +268,7 @@ angular.module('sauna', [
 			controller: function ($scope, $uibModalInstance, $http) {
 				$scope.time = time;
 				$scope.submit = function () {
-					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+					$uibModalInstance.close();
 				};
 			}
 		}).result.then(function() {
@@ -270,7 +286,7 @@ angular.module('sauna', [
 			controller: function ($scope, $uibModalInstance, $http) {
 				$scope.user = user;
 				$scope.submit = function () {
-					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+					$uibModalInstance.close();
 				};
 			}
 		}).result.then(function() {
@@ -296,7 +312,7 @@ angular.module('sauna', [
 			controller: function ($scope, $uibModalInstance, $http) {
 				$scope.time = time;
 				$scope.submit = function () {
-					$uibModalInstance.close({name: $scope.name, label: $scope.label, caseType: $scope.caseType});
+					$uibModalInstance.close();
 				};
 			}
 		}).result.then(function() {
