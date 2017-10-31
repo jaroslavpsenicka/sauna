@@ -22,6 +22,11 @@ angular.module('sauna.services', ['ngResource'])
 
 .factory('timesService', function($resource) {
     return $resource('rest/times', {id: '@id'}, {
+        cancel: {
+            url: 'rest/times/:token/:id',
+            method: 'DELETE',
+            params: { id: '@id', token: '@token' }
+        }
     });
 })
 

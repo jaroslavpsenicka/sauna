@@ -80,8 +80,8 @@ module.exports = function (app) {
 	});
 
 	// create time
-	app.put('/rest/times', function(req, res) {
-		Time.create({timeRef: req.body.timeRef, createdBy: req.body.createdBy, createdAt: new Date()}, function(err, times) {
+	app.post('/rest/times', function(req, res) {
+		Time.create(req.body, function(err) {
 			if (err) throw err;
 			res.status(201).send();
 		});
@@ -100,10 +100,13 @@ module.exports = function (app) {
 	});
 
 	// delete time
-	app.delete('/rest/times/:id', function(req, res) {
-		Time.findById(req.params.id, function(req, time) {
+	app.delete('/rest/times/:userToken/:id', function(req, res) {
+		var user = tokens[req.params.userToken];
+		if (!user) return res.status(400).send({error: "the user is not known"});			
+
+		Time.findById(req.params.id, function(err) {
 			if (err) throw err;
-		}).delete(function(err, time) {
+		}).remove(function(err) {
 			if (err) throw err;
 			res.status(200).send();
 		}); 

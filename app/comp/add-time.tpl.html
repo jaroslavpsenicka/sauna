@@ -3,10 +3,29 @@
 </div>
 <form name="form" class="form-horizontal" role="form" ng-submit="submit()">
     <div class="modal-body">
-
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="date" translate>Date:</label>
+            <div class="col-sm-7">
+                <input type="date" class="form-control" id="date" ng-model="time.date" datepicker-options="options" required>
+            </div>
+            <div class="col-sm-3">
+                <div uib-timepicker ng-model="time.date" show-spinners="false" show-meridian="false" class="pull-right"></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="type" translate>Type:</label>
+            <div class="col-sm-10">
+                <div class="btn-group">
+                    <a class="btn btn-default" ng-model="time.type" uib-btn-radio="'MEN'">MEN</a>
+                    <a class="btn btn-default" ng-model="time.type" uib-btn-radio="'OPEN'">OPEN</a>
+                    <a class="btn btn-default" ng-model="time.type" uib-btn-radio="'WOMEN'">WOMEN</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-ng-click="$dismiss('cancel')">Cancel</button>
-        <button type="button" class="btn btn-primary" translate data-ng-click="$close('ok')">Add time</button>
+        <button type="button" class="btn btn-primary" translate data-ng-click="$close(time)">Add time</button>
     </div>
 </form>
+
