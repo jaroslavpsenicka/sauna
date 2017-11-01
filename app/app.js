@@ -267,6 +267,28 @@ angular.module('sauna', [
 		});
 	};
 
+	$scope.editUser = function(user) {
+		$uibModal.open({
+			templateUrl: 'comp/edit-user.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.user = user;
+				$scope.submit = function () {
+					$uibModalInstance.close();
+				};
+			}
+		}).result.then(function(operation) {
+			if (operation == 'save') {
+				usersService.save({id: user.id}, user, function(response) {
+					$scope.loadUsers();
+				});
+			} else if (operation == 'remove') {
+				usersService.remove({id: user.id}, function(response) {
+					$scope.loadUsers();
+				});
+			}
+		});
+	};
+
 	$scope.loadUsers();
 
 })	

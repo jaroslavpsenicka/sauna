@@ -6,21 +6,18 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th class="col-md-3" translate>Name</th>
-                            <th class="col-md-3" translate>Email</th>
-                            <th class="col-md-3"></th>
+                            <th class="col-md-4" translate>Name</th>
+                            <th class="col-md-5" translate>Email</th>
+                            <th class="col-md-1" translate>Role</th>
+                            <th class="col-md-2" translate>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="time in times | orderBy: 'date'">
-                            <td class="text-center">
-                                <i ng-class="time.type == 'MEN' ? 'fa-male' : time.type == 'WOMEN' ? 'fa-female' : 'fa-question-circle'" 
-                                    class="fa fa-2x"></i>
-                            </td>
-                            <td>{{time.date | date:'MMM dd, HH:mm'}}</td>
-                            <td class="text-right">    
-                                <a href ng-click="cancelTime(time)" translate>Cancel booking</a>
-                            </td>
+                        <tr ng-repeat="user in users | orderBy: 'name'" ng-click="edit(user)">
+                            <td>{{user.name}}</td>
+                            <td>{{user.email}}</td>
+                            <td>{{user.role}}</td>
+                            <td>{{time.status}}</td>
                         </tr>
                     </tbody>
                 </table>
