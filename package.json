@@ -16,6 +16,7 @@
     "mongoosemask": "0.0.6",
     "morgan": "^1.1.1",
     "node-uuid": "^1.4.8",
-    "nodemon": "^1.9.2"
+    "nodemon": "^1.9.2",
+    "elasticsearch": "^13.3.1"
   }
 }

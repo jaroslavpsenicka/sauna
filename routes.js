@@ -2,6 +2,10 @@ var config = require('./config');
 var util = require('util');
 var log4js = require('log4js');
 var uuid = require('node-uuid');
+var elasticsearch = require('elasticsearch');
+var esclient = new elasticsearch.Client({
+    host: config.elasticsearch.url
+});
 
 var ObjectId = require('mongoose').Types.ObjectId; 
 var User = require('./model/user');
@@ -26,6 +30,71 @@ User.remove({}, function(err) {
 		status: 'BANNED', name: 'Frank Banned', email: 'frank@sauna-abc.cz', password: 'password', role: 'USER' });	
 });
 
+var monitor = {
+
+	login: function(user, error) {
+		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
+			type: 'LOGIN',
+			timestamp: new Date(),
+			status: (user ? 200 : 401),
+			error: error,
+			user: user    
+		}}, function (error, response) {
+			console.log(error);
+		});
+	},
+
+	registration: function(user, error) {
+		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
+			type: 'REGISTER',
+			timestamp: new Date(),
+			status: error ? 500 : 200,
+			error: error,
+			user: user    
+		}}, function (error, response) {
+			console.log(error);
+		});
+	},
+
+	userConfirmed: function(user, error) {
+		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
+			type: 'USER CONFIRMED',
+			timestamp: new Date(),
+			status: error ? 500 : 200,
+			error: error,
+			user: user    
+		}}, function (error, response) {
+			console.log(error);
+		});
+	},
+
+	bookingCreated: function(user, booking, error) {
+		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
+			type: 'BOOKING CREATED',
+			timestamp: new Date(),
+			user: user,
+			status: error ? 500 : 200,
+			error: error,
+			booking: booking    
+		}}, function (error, response) {
+			console.log(error);
+		});
+	},
+
+	bookingCancelled: function(user, booking, error) {
+		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
+			type: 'BOOKING CANCELLED',
+			timestamp: new Date(),
+			user: user,
+			status: error ? 500 : 200,
+			error: error,
+			booking: booking    
+		}}, function (error, response) {
+			console.log(error);
+		});
+	}
+};
+
 module.exports = function (app) {
 
 	// validate token
@@ -46,6 +115,7 @@ module.exports = function (app) {
 			email: req.body.email,
 			password: req.body.password
        	}, function (err, user) {
+			monitor.login(user, err);
 			if (err) throw err;
 			if (user) {
 				var token = uuid.v4();
@@ -74,6 +144,7 @@ module.exports = function (app) {
 			password: req.body.password,
 			role: 'USER'
        	}, function (err, user) {
+			monitor.registration(user, err);
 			if (err) throw err;
 			var token = uuid.v4();
 			tokens[token] = user;
@@ -235,6 +306,7 @@ module.exports = function (app) {
 			Booking.findOne({ 'timeRef': req.params.time, 'createdBy': req.params.user }, function(req, booking) {
 				booking.confirmedAt = new Date();
 				booking.save(function(err) {
+					monitor.userConfirmed(user, err);
 					if (err) throw err;
 					return res.status(200).send();
 				});	
@@ -284,6 +356,7 @@ module.exports = function (app) {
 						});	
 					});
 				} else Booking.create(booking, function(err) {
+					monitor.bookingCreated(user, booking, err);
 					if (err) throw err;
 					Booking.find({ 'timeRef': req.body.timeRef }, createBookingCallback);				
 				});			
@@ -305,6 +378,7 @@ module.exports = function (app) {
 
 			booking.forEach(function(b) {
 				b.remove(function(err) {
+					monitor.bookingCancelled(user, booking, err);
 					if (err) throw err;
 				});	
 			});
