@@ -30,6 +30,12 @@ angular.module('sauna', [
 		resolve: {
 			translation: translateFn
 		}
+	}).when("/users", {
+		templateUrl: "users.html",
+		controller: "UsersCtrl",
+		resolve: {
+			translation: translateFn
+		}
 	}).when("/booking", {
 		templateUrl: "booking.html",
 		controller: "BookingCtrl",
@@ -253,6 +259,18 @@ angular.module('sauna', [
 
 	$scope.loadMyTimes();
 })
+
+.controller('UsersCtrl', function ($scope, $uibModal, currentUser, usersService) {
+
+	$scope.loadUsers = function() {
+		usersService.query({"token": currentUser.token}, function(users) {
+			$scope.users = users;
+		});
+	};
+
+	$scope.loadUsers();
+
+})	
 
 .controller('BookingCtrl', function ($scope, $uibModal, currentUser, userService, bookingService) {
 	

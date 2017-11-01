@@ -20,6 +20,11 @@ angular.module('sauna.services', ['ngResource'])
     });
 })
 
+.factory('usersService', function($resource) {
+    return $resource('rest/users', {id: '@id', token: '@token'}, {
+    });
+})
+
 .factory('timesService', function($resource) {
     return $resource('rest/times', {id: '@id'}, {
     });
