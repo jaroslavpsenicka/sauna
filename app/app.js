@@ -155,26 +155,28 @@ angular.module('sauna', [
 	$scope.currentUser = currentUser;
 	$scope.myTimes = {};
 
-	timesService.query({}, function(response) {
-		var timeIds = [];
-		$scope.times = {};
-		$scope.bookings = {};
-		angular.forEach(response.map(function(time) {
-			return { id: time._id, type: time.type, date: new Date(time.date) };
-		}), function(time) {
-			var date = time.date.getFullYear() + '-' + (time.date.getMonth() + 1) + '-' + time.date.getDate();
-			if (!$scope.times[date]) $scope.times[date] = [];
-			$scope.times[date].push(time);
-			timeIds.push(time.id);
-		});
+	$scope.loadTimes = function() {
+		timesService.query({}, function(response) {
+			var timeIds = [];
+			$scope.times = {};
+			$scope.bookings = {};
+			angular.forEach(response.map(function(time) {
+				return { id: time._id, type: time.type, date: new Date(time.date) };
+			}), function(time) {
+				var date = time.date.getFullYear() + '-' + (time.date.getMonth() + 1) + '-' + time.date.getDate();
+				if (!$scope.times[date]) $scope.times[date] = [];
+				$scope.times[date].push(time);
+				timeIds.push(time.id);
+			});
 
-		bookingService.findAll({}, { ids: timeIds }, function(data) {
-			angular.forEach(data, function(booking) {
-				if (!$scope.bookings[booking.timeRef]) $scope.bookings[booking.timeRef] = 0;
-				$scope.bookings[booking.timeRef] = $scope.bookings[booking.timeRef] + 1;
+			bookingService.findAll({}, { ids: timeIds }, function(data) {
+				angular.forEach(data, function(booking) {
+					if (!$scope.bookings[booking.timeRef]) $scope.bookings[booking.timeRef] = 0;
+					$scope.bookings[booking.timeRef] = $scope.bookings[booking.timeRef] + 1;
+				});
 			});
 		});
-	});
+	};
 
 	$scope.timeDisabled = function(time) {
 		if (currentUser.role == 'ADMIN') return false;
@@ -200,14 +202,12 @@ angular.module('sauna', [
 		$uibModal.open({
 			templateUrl: 'comp/add-time.tpl.html',
 			controller: function ($scope, $uibModalInstance, $http) {
-				$scope.time = { date: new Date(), type: 'OPEN'}
-				$scope.submit = function () {
-					$uibModalInstance.close(time);
-				};
+				$scope.time = { date: new Date(), type: 'OPEN' };
+				$scope.options = { minDate: new Date() };
 			}
 		}).result.then(function(time) {
-			timesService.create({}, time, function() {
-				$scope.loadMyTimes();
+			timesService.save({}, time, function() {
+				$scope.loadTimes();
 			});
 		});
 	};
@@ -250,13 +250,12 @@ angular.module('sauna', [
 	}
 
 	var cancelTime = function(time) {
-		bookingService.cancel({ token: currentUser.token, id: time._id }, {}, function() {
-			bookingService.findAdmin({ token: currentUser.token }, {}, function(data) {
-				$scope.loadMyTimes();
-			});
+		timesService.cancel({ token: currentUser.token, id: time.id }, {}, function() {
+			$scope.loadTimes();
 		});
 	}
 
+	$scope.loadTimes();
 	$scope.loadMyTimes();
 })
 
