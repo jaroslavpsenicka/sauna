@@ -2,22 +2,29 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12 col-md-12">
-                <h3 translate="">Users</h3>
+                <h3>
+                    <span translate>Users</span>
+                    <div class="pull-right">
+                        <input class="form-control" ng-model="filter" placeholder="type to filter">
+                    </div>                
+                </h3>
                 <table class="table">
                     <thead>
                         <tr>
+                            <th class="col-md-1" translate></th>
                             <th class="col-md-4" translate>Name</th>
-                            <th class="col-md-5" translate>Email</th>
-                            <th class="col-md-1" translate>Role</th>
-                            <th class="col-md-2" translate>Status</th>
+                            <th class="col-md-7" translate>Email</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="user in users | orderBy: 'name'" ng-click="editUser(user)" class="selectable">
+                        <tr ng-repeat="user in users | filter: filter | orderBy: 'name'" ng-click="editUser(user)" 
+                            ng-class="user.status == 'NEW' ? 'success' : user.status == 'BANNED' ? 'danger ' : ''" 
+                            class="selectable">
+                            <td class="text-center"><i class="fa fa-2x" 
+                                ng-class="user.role == 'ADMIN' ? 'fa-user' : user.role == 'RECEPTION' ? 'fa-id-card-o' : ''"></i>
+                            </td>
                             <td>{{user.name}}</td>
                             <td>{{user.email}}</td>
-                            <td>{{user.role}}</td>
-                            <td>{{user.status}}</td>
                         </tr>
                     </tbody>
                 </table>
