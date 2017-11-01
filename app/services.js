@@ -21,7 +21,7 @@ angular.module('sauna.services', ['ngResource'])
 })
 
 .factory('usersService', function($resource) {
-    return $resource('rest/users', {id: '@id', token: '@token'}, {
+    return $resource('rest/users/:token', {id: '@id', token: '@token'}, {
     });
 })
 

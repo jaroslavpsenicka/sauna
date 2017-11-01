@@ -24,22 +24,27 @@
                     <a class="btn btn-default" ng-model="user.role" uib-btn-radio="'ADMIN'">ADMIN</a>
                 </div>
             </div>
-            <div ng-show="user.role == 'RECEPTION'" class="col-sm-10 offset-sm-2" translate>Hey! Welcome new receptionist {{user.name}}!</div>
-            <div ng-show="user.role == 'ADMIN'" class="col-sm-10 offset-sm-2" translate>Please note, that creating 
-                users with strong privileges are under strict supervision and you might be questioned for a reason
-                of doing that. 
+            <div ng-show="user.role == 'RECEPTION'" class="col-sm-10 col-sm-offset-2 small spaced" translate>Hey! Welcome new receptionist {{user.name}}!</div>
+            <div ng-show="user.role == 'ADMIN'" class="col-sm-10 col-sm-offset-2 small spaced">Please note, that creating users with strong privileges 
+                are under strict supervision and you might be questioned for a reason of doing that. 
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-2" for="verified" translate>Verified:</label>
+            <label class="control-label col-sm-2" for="verified" translate>Status:</label>
             <div class="col-sm-10">
-                <input type="checkbox" class="form-control" id="verified" ng-model="user.verified">
+                <div class="btn-group">
+                    <a class="btn btn-default" ng-model="user.status" uib-btn-radio="'NEW'">NEW</a>
+                    <a class="btn btn-default" ng-model="user.status" uib-btn-radio="'VERIFIED'">VERIFIED</a>
+                    <a class="btn btn-default" ng-model="user.status" uib-btn-radio="'BANNED'">BANNED</a>
+                </div>
             </div>
+            <div ng-show="user.status == 'NEW'" class="col-sm-10 col-sm-offset-2 small spaced" translate>New users can book only one time slot.</div>
+            <div ng-show="user.status == 'BANNED'" class="col-sm-10 col-sm-offset-2 small spaced" translate>Once banned, the user cannot login.</div>
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-ng-click="$dismiss('cancel')">Cancel</button>
-        <button type="button" class="btn btn-primary" translate data-ng-click="$close(time)">Add time</button>
+        <button type="button" class="btn btn-primary" translate data-ng-click="$close(user)">Save user</button>
     </div>
 </form>
 

@@ -13,11 +13,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="user in users | orderBy: 'name'" ng-click="edit(user)">
+                        <tr ng-repeat="user in users | orderBy: 'name'" ng-click="editUser(user)" class="selectable">
                             <td>{{user.name}}</td>
                             <td>{{user.email}}</td>
                             <td>{{user.role}}</td>
-                            <td>{{time.status}}</td>
+                            <td>{{user.status}}</td>
                         </tr>
                     </tbody>
                 </table>
