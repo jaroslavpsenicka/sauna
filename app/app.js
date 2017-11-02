@@ -277,7 +277,7 @@ angular.module('sauna', [
 					$uibModalInstance.close();
 				};
 			}
-		}).result.then(function() {
+		}).result.then(function(user) {
 			usersService.save({id: user.id}, user, function(response) {
 				$scope.loadUsers();
 			});
@@ -293,7 +293,7 @@ angular.module('sauna', [
 					$uibModalInstance.close();
 				};
 			}
-		}).result.then(function() {
+		}).result.then(function(user) {
 			usersService.save({id: user.id}, user, function(response) {
 				$scope.loadUsers();
 			});

@@ -32,13 +32,25 @@ User.remove({}, function(err) {
 
 var monitor = {
 
-	login: function(user, error) {
+	loginSuccessful: function(user, error) {
 		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
 			type: 'LOGIN',
 			timestamp: new Date(),
-			status: (user ? 200 : 401),
+			status: 200,
 			error: error,
 			user: user    
+		}}, function (error, response) {
+			console.log(error);
+		});
+	},
+
+	loginFailure: function(email, password, error) {
+		esclient.index({ index: config.elasticsearch.index, type: config.elasticsearch.type, body: {
+			type: 'LOGIN',
+			timestamp: new Date(),
+			status: 401,
+			error: error,
+			user: { email: email, password: password}    
 		}}, function (error, response) {
 			console.log(error);
 		});
@@ -115,7 +127,8 @@ module.exports = function (app) {
 			email: req.body.email,
 			password: req.body.password
        	}, function (err, user) {
-			monitor.login(user, err);
+			if (user) monitor.loginSuccessful(user, err);
+			else monitor.loginFailure(req.body.email, req.body.password, err);
 			if (err) throw err;
 			if (user) {
 				var token = uuid.v4();
