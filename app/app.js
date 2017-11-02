@@ -267,6 +267,23 @@ angular.module('sauna', [
 		});
 	};
 
+	$scope.addUser = function() {
+		$uibModal.open({
+			templateUrl: 'comp/edit-user.tpl.html',
+			controller: function ($scope, $uibModalInstance, $http) {
+				$scope.isNew = true;
+				$scope.user = { role: 'USER', status: 'NEW' };
+				$scope.submit = function () {
+					$uibModalInstance.close();
+				};
+			}
+		}).result.then(function() {
+			usersService.save({id: user.id}, user, function(response) {
+				$scope.loadUsers();
+			});
+		});
+	};
+
 	$scope.editUser = function(user) {
 		$uibModal.open({
 			templateUrl: 'comp/edit-user.tpl.html',
