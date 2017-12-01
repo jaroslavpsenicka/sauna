@@ -10,6 +10,7 @@
                     <div class="form-group">
                         <input type="password" ng-model="loginData.password" id="password" class="form-control" placeholder="Password" required>
                     </div>
+                    <div class="row text-center" ng-show="userBanned" translate>User is not alowed to login</div>
                     <div class="row">
                         <div class="spaced col-xs-6 col-sm-6">
                             <a ng-click="toggle()" class="btn btn-default btn-block" translate>Register</a>
@@ -22,7 +23,7 @@
             </form>
         </div>
         <div ng-show="!showLogin" class="col-md-4 col-md-offset-4">
-            <form role="registerForm">
+            <form name="registerForm">
                 <fieldset>
                     <h2 translate>Sign Up</h2>
                     <div class="spaced form-group">
@@ -43,6 +44,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row text-center" ng-show="registerForm.name.$error.required" translate>No user name given</div>
+                    <div class="row text-center" ng-show="registerForm.email.$error.email">Enter the valid email address</div>
+                    <div class="row text-center" ng-show="!passwordMatch()" translate>Passwords does not match</div>
                     <div class="row">
                         <div class="spaced col-xs-6 col-sm-6">
                             <a ng-click="toggle()" class="btn btn-default btn-block" translate>Sign In</a>

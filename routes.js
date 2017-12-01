@@ -67,7 +67,9 @@ module.exports = function (app) {
 
 	// register
 	app.post('/rest/auth/register', function(req, res) {
+		var id = new ObjectId();
 		User.create({
+			_id: id,
 			status: 'NEW',
 			name: req.body.name,
 			email: req.body.email,

@@ -104,7 +104,6 @@ angular.module('sauna', [
     $scope.tran = $translate.use();
 	$scope.useLanguage = function(language) {
 		$translate.use(language).then(function() {
-			$location.path('/');
 			$http({url: '/messages-' + language + '.json'}).success(function(messages) {
 				window.i18n = messages;
 				$route.reload();
@@ -121,6 +120,7 @@ angular.module('sauna', [
 
 .controller('LoginCtrl', function ($scope, userService, $location, currentUser) {
 
+	$scope.userBanned = false;
 	$scope.showLogin = true;
 	$scope.loginData = {};
 	$scope.registerData = {};
@@ -131,14 +131,22 @@ angular.module('sauna', [
 
 	$scope.signin = function() {
 		userService.login({}, $scope.loginData, function(data) {
-			currentUser.token = data.token;
-			$location.path('/my');
+			if (data.status != 'BANNED') {
+				currentUser.token = data.token;
+				$location.path('/my');
+			} else {
+				$scope.userBanned = true;
+			}
 		});
 	},
 
+	$scope.passwordMatch = function() {
+		return $scope.registerData.password && $scope.registerData.password == $scope.registerData.password2;
+	},
+
 	$scope.registerValid = function() {
-		return $scope.registerData.name && $scope.registerData.email && 
-			$scope.registerData.password && $scope.registerData.password == $scope.registerData.password2;
+		return $scope.registerData.name && $scope.registerData.email && $scope.passwordMatch();
+			
 	},
 
 	$scope.register = function() {
@@ -156,11 +164,15 @@ angular.module('sauna', [
 	$scope.myTimes = {};
 
 	$scope.loadTimes = function() {
+		var now = new Date();
 		timesService.query({}, function(response) {
 			var timeIds = [];
 			$scope.times = {};
 			$scope.bookings = {};
-			angular.forEach(response.map(function(time) {
+			var dates = response.filter(function(time) {
+				return new Date(time.date) >= now;
+			});
+			angular.forEach(dates.map(function(time) {
 				return { id: time._id, type: time.type, date: new Date(time.date) };
 			}), function(time) {
 				var date = time.date.getFullYear() + '-' + (time.date.getMonth() + 1) + '-' + time.date.getDate();

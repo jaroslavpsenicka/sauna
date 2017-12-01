@@ -14,6 +14,10 @@
     "Register": "Registrace",
     "Sign In": "Přihlášení",
     "Sign Up": "Rgistrace",
+    "No user name given": "Zadejte jméno uživatele",
+    "Enter the valid email address": "Zadejte platnou emailovou adresu",
+    "Passwords does not match": "Hesla se neshodují",
+    "User is not alowed to login": "Přihlášení uživatele není dovoleno",
 
     "Booking": "Rezervace",
     "Users":"Uživatelé",
