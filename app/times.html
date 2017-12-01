@@ -2,22 +2,30 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12 col-md-12">
-                <button ng-show="currentUser.role == 'ADMIN'" ng-click="addTime()" class="btn btn-warning pull-right">
-                    <i class="fa fa-plus"></i>&nbsp;
-                    <span translate>Add</span>                            
-                </button>
-                <h3 translate>Schedule</h3>
+                <h3>
+                    <span translate>Schedule</span>
+                    <div class="pull-right">
+                        <input class="form-control" ng-model="filter" placeholder="type to filter, try 'men'">
+                    </div>                
+                </h3>
             </div>
 
             <div ng-repeat="day in keys(times) | orderBy:'day'" class="spaced col-lg-12 col-md-12">
                 <h4 translate>{{day | asDate | date:'MMM dd'}}</h4>
-                <a ng-repeat="time in times[day] | orderBy:'date'" ng-click="bookTime(time)" ng-disabled="timeDisabled(time)" 
+                <a ng-repeat="time in times[day] | filter: filter | orderBy:'date'" ng-click="bookTime(time)" ng-disabled="timeDisabled(time)" 
                     class="btn btn-sq right-bottom-spaced" ng-class="myTimes[time.id] ? 'btn-success' : 'btn-default'">
                     <i ng-class="time.type == 'MEN' ? 'fa-male' : time.type == 'WOMEN' ? 'fa-female' : 'fa-question-circle'" class="fa fa-3x"></i>
                     <br/><br/>{{time.date | date:'H:mm'}} ({{bookings[time.id] || '0'}})
                 </a>
             </div>
 
+            <div class="col-lg-12 col-md-12">
+                <button ng-show="currentUser.role == 'ADMIN'" ng-click="addTime()" class="btn btn-warning pull-right">
+                    <i class="fa fa-plus"></i>&nbsp;
+                    <span translate>Add</span>                            
+                </button>
+            </div>
+            
         </div>
     </div>
 </div>
